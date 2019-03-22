@@ -55,6 +55,7 @@ namespace VKbot
                 "175803143",
                 "175803170"
             };
+        static string _wallPick = "photo179992947_456239019";
         static HttpClient _httpClient = new HttpClient();
         static Random random = new Random();
 
@@ -164,11 +165,17 @@ namespace VKbot
 
             foreach(var objectVK in responseObj.updates.Where(t => t.type == "message_new" || t.type == "message_reply").Select(t => t.@object).ToList())
             {
-                if (!string.IsNullOrWhiteSpace(objectVK.text)) {
-                    if(objectVK.from_id == _vityaId)
+                if(objectVK.from_id == _vityaId)
+                {
+                    if (objectVK.attachments != null && objectVK.attachments.Any(t => t.type == "wall"))
                     {
-                        processMeme(objectVK.peer_id, objectVK.text);
-                    } else if (_memePhrases.Any(t => objectVK.text.ToLowerInvariant().StartsWith(t)))
+                        sendMessage(objectVK.peer_id, _wallPick);
+                    } else if (!string.IsNullOrWhiteSpace(objectVK.text))
+                    {
+                            processMeme(objectVK.peer_id, objectVK.text);
+                    }
+                } else if (!string.IsNullOrWhiteSpace(objectVK.text)) {
+                    if (_memePhrases.Any(t => objectVK.text.ToLowerInvariant().StartsWith(t)))
                     {
                         foreach(var memePhrase in _memePhrases.Where(t => objectVK.text.ToLowerInvariant().StartsWith(t))) {
                             int index = objectVK.text.ToLowerInvariant().IndexOf(memePhrase);
@@ -312,7 +319,7 @@ namespace VKbot
             DataContractJsonSerializer ser = new DataContractJsonSerializer(result.GetType());  
             result = ser.ReadObject(ms) as T;
             ms.Close();
-            return result;  
+            return result;
         }
     }
 }

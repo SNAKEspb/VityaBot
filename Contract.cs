@@ -60,6 +60,9 @@ namespace Util {
         public string text;
         [DataMember]
         public int random_id;
+
+        [DataMember]
+        public Update[] attachments;
         
     }
     [DataContract]
